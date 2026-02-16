@@ -10,7 +10,7 @@ def inf_norm(u, uhat) -> float:
     return np.max(np.abs(u - uhat))
 
 
-def fdcoeffV_uniform(k,xbar,stencil, h):
+def fdcoeffV_uniform(k: int, h: float, stencil: np.ndarray):
     n = len(stencil)
     A = np.ones((n,n))
     xrow = stencil
@@ -23,13 +23,13 @@ def fdcoeffV_uniform(k,xbar,stencil, h):
     return 1/h**k * c
 
 def der_approx_uniform(k: int, xbar: float, h, u_func, stencil):
-    coeff = fdcoeffV_uniform(k,xbar,stencil, h)
+    coeff = fdcoeffV_uniform(k,h,stencil)
     U = u_func(xbar+h*stencil)
     #print(U)
     der = np.dot(coeff,U)
     return der
 
-def fdcoeffV(k,xbar,x):
+def fdcoeffV(k: int,xbar,x):
     '''
         # Parameters
         k: derivative order
