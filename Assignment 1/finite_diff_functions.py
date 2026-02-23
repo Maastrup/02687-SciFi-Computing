@@ -29,7 +29,7 @@ def der_approx_uniform(k: int, xbar: float, h, u_func, stencil):
     der = np.dot(coeff,U)
     return der
 
-def fdcoeffV(k: int,xbar,x):
+def fdcoeffV(k: int, xbar, x):
     '''
         # Parameters
         k: derivative order
