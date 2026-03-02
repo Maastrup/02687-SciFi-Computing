@@ -3,11 +3,11 @@ from scipy import sparse
 from scipy.special import factorial
 import matplotlib.pyplot as plt
 
-def l2_norm(u, uhat) -> float:
-    return np.sqrt(np.sum((u - uhat)**2))
+def l2_norm(v) -> float:
+    return np.sqrt(np.sum((v)**2))
 
-def inf_norm(u, uhat) -> float:
-    return np.max(np.abs(u - uhat))
+def inf_norm(v) -> float:
+    return np.max(np.abs(v))
 
 
 def fdcoeffV_uniform(k: int, h: float, stencil: np.ndarray):
