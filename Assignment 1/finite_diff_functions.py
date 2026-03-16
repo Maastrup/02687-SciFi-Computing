@@ -6,8 +6,14 @@ import matplotlib.pyplot as plt
 def l2_norm(v) -> float:
     return np.sqrt(np.sum((v)**2))
 
+def l2_norm_grid(v, h: float) -> float:
+    return h * l2_norm(v)
+
 def inf_norm(v) -> float:
     return np.max(np.abs(v))
+
+def inf_norm_grid(v,h:float) -> float:
+    return h**2 * inf_norm(v)
 
 
 def fdcoeffV_uniform(k: int, h: float, stencil: np.ndarray):
