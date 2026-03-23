@@ -23,13 +23,6 @@ def build_1d_laplacian_dirichlet(m: int, h: float):
     return sparse.diags_array(data, offsets=[-1, 0, 1], shape=(m,m), format="csr")
 
 
-def weighted_jacobi_step(A: sparse.spmatrix, F: np.ndarray, U: np.ndarray, omega: float) -> np.ndarray:
-    """One weighted Jacobi iteration for A U = F."""
-    diagA = A.diagonal()
-    r = F - A @ U
-    return U + omega * (r / diagA)
-
-
 def main() -> None:
     a = 0.5
 
@@ -45,11 +38,13 @@ def main() -> None:
 
     A = build_1d_laplacian_dirichlet(m, h)
 
-    X = np.linspace(h, 1.0 - h, m)
+    X = np.linspace(h, 1.0 - h, m) # interior
     F = f(X)
     F = F.astype(float, copy=True)
     F[0] -= u(0.0) / h**2
     F[-1] -= u(1.0) / h**2
+
+    print(u(0), u(1))
 
     Uhat = u(X)
     Ehat = spsolve(A, F) - Uhat
@@ -62,12 +57,16 @@ def main() -> None:
     b = Minv @ F
 
     omega = 2.0 / 3.0
+    U2 = 1 + 2 * X # Initial guess: straight line with slope 2
+    plt.plot(X, Uhat, 'b-', label="exact")
+    plt.plot(X, U2, "gx", label="inti guess")
+    plt.legend()
+    plt.show()
 
     plt.ion()
     fig, (ax_u, ax_e) = plt.subplots(1, 2, figsize=(12, 4))
     fig.set_facecolor("white")
 
-    U2 = 1 + 2 * X
 
     for i in range(1, 11):
         U2 =(1-omega)*U2 + omega*(G@U2 + b)
@@ -137,7 +136,7 @@ def main() -> None:
     input("Paused after coarse grid projection. Press Enter to continue...")
 
     for i in range(1, 11):
-        U2 = weighted_jacobi_step(A, F, U2, omega)
+        U2 = (1-omega) * U2 + omega*(G@U2 + b)
         E2 = U2 - Uhat
 
         ax_u.cla()
