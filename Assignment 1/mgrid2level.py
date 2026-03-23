@@ -14,13 +14,13 @@ from scipy import sparse
 from scipy.sparse.linalg import spsolve
 
 
-def build_1d_laplacian_dirichlet(m: int, h: float) -> sparse.spmatrix:
+def build_1d_laplacian_dirichlet(m: int, h: float):
     """Return the standard 1D second-difference matrix with Dirichlet BCs."""
     data = np.zeros((3, m), dtype=float)
     data[0, 1:] = 1.0 / h**2
     data[1, :] = -2.0 / h**2
     data[2, :-1] = 1.0 / h**2
-    return sparse.spdiags(data, [-1, 0, 1], m, m, format="csr")
+    return sparse.diags_array(data, offsets=[-1, 0, 1], shape=(m,m), format="csr")
 
 
 def weighted_jacobi_step(A: sparse.spmatrix, F: np.ndarray, U: np.ndarray, omega: float) -> np.ndarray:
@@ -54,6 +54,13 @@ def main() -> None:
     Uhat = u(X)
     Ehat = spsolve(A, F) - Uhat
 
+    M = sparse.diags_array(A.diagonal())
+    print(M.shape)
+    Minv = M**-1
+    N = M - A
+    G = Minv @ N
+    b = Minv @ F
+
     omega = 2.0 / 3.0
 
     plt.ion()
@@ -63,7 +70,7 @@ def main() -> None:
     U2 = 1 + 2 * X
 
     for i in range(1, 11):
-        U2 = weighted_jacobi_step(A, F, U2, omega)
+        U2 =(1-omega)*U2 + omega*(G@U2 + b)
         E2 = U2 - Uhat
 
         ax_u.cla()
