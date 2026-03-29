@@ -2,6 +2,7 @@ import numpy as np
 from scipy import sparse
 from scipy.special import factorial
 import matplotlib.pyplot as plt
+import line_profiler
 
 def l2_norm(v) -> float:
     return np.sqrt(np.sum((v)**2))
@@ -115,16 +116,6 @@ def coarsen(R, m):
     # Half weighting
     for i in range(mc):
         for j in range(mc):
-            '''
-                ic = kc % mc
-                jc = kc // mc
-                k = 2ic + 2*jc*m 
-                k = 2*kc
-                k = i + j*m = 2*kc
-                (i ± 1, j) = k ± 1 = 2*kc ± 1
-                (i, j ± 1) = k ± m = 2*kc ± m
-            '''
-
             kc = i + j*mc
             k = (2*i + 1) + (2*j + 1)*m
 
@@ -132,7 +123,11 @@ def coarsen(R, m):
             left  = R[k-1] 
             right = R[k+1] 
             up  = R[k-m]   
-            down    = R[k+m]
+            down = R[k+m]
+            nw = R[k - 1 - m]
+            sw = R[k - 1 + m]
+            ne = R[k + 1 - m]
+            se = R[k + 1 + m]
             
             Rc[kc] = 1 / 8 * (
                 left # (i - 1, j)
@@ -143,16 +138,14 @@ def coarsen(R, m):
             )
     return Rc
 
-def index_c_to_f(i,j):
-    return (2*i + 1, 2*j + 1)
-
+@line_profiler.profile
 def scatter(Rc, m):
     mc = m // 2
     fine = np.zeros(m**2)
     fine.reshape(m,m)[1::2, 1::2] = Rc.reshape(mc, mc)
     for ic in range(mc):
         for jc in range(mc):
-            i, j = index_c_to_f(ic, jc)
+            i, j = (2*ic + 1, 2*jc + 1)
             # fine indexes
             n = i + (j-1) * m
             s = i + (j + 1) * m
@@ -169,3 +162,38 @@ def scatter(Rc, m):
             fine[corners] += 1/4 * center_val
             fine[cross] += 1/2 * center_val
     return fine
+
+def prolong_bilinear(e_coarse: np.ndarray, mc: int) -> np.ndarray:
+    """Bilinear prolongation from coarse grid (mc x mc) to fine grid (m x m).
+
+    Fine size is m = 2*mc + 1.
+    """
+    ec = e_coarse.reshape(mc,mc)
+    m = 2 * mc + 1
+    ef = np.zeros((m, m), dtype=float)
+
+    # Inject coarse points onto fine grid at odd indices.
+    ef[1::2, 1::2] = ec
+
+    # Interpolate in x-direction (even i, odd j)
+    ef[0::2, 1::2] = 0.5 * (
+        np.pad(ec, ((1, 0), (0, 0)), mode="constant")[:-1, :] +
+        np.pad(ec, ((0, 1), (0, 0)), mode="constant")[1:, :]
+    )
+
+    # Interpolate in y-direction (odd i, even j)
+    ef[1::2, 0::2] = 0.5 * (
+        np.pad(ec, ((0, 0), (1, 0)), mode="constant")[:, :-1] +
+        np.pad(ec, ((0, 0), (0, 1)), mode="constant")[:, 1:]
+    )
+
+    # Interpolate centers (even i, even j): average of 4 surrounding coarse points
+    ec_pad = np.pad(ec, ((1, 1), (1, 1)), mode="constant")
+    ef[0::2, 0::2] = 0.25 * (
+        ec_pad[0:mc + 1, 0:mc + 1] +
+        ec_pad[1:mc + 2, 0:mc + 1] +
+        ec_pad[0:mc + 1, 1:mc + 2] +
+        ec_pad[1:mc + 2, 1:mc + 2]
+    )
+
+    return ef.reshape(-1)

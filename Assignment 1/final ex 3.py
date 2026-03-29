@@ -2,7 +2,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import sparse
 from scipy.sparse.linalg import spsolve
-from finite_diff_functions import l2_norm_grid, smooth, coarsen, scatter
+from finite_diff_functions import l2_norm_grid, prolong_bilinear, smooth, coarsen, scatter
+import sys
 
 # MoMS solution to the Poisson problem in 2D
 def u_func(x,y):
@@ -12,6 +13,13 @@ def f_func(x,y):
     term1 = -32*np.pi**2*np.sin(4*np.pi*(x+y))
     term2 = -16*np.pi**2*(x**2 + y**2)*np.cos(4*np.pi*x*y)
     return term1 + term2
+
+
+def u_func2(x,y):
+    return np.exp(np.pi * x) * np.sin(np.pi * y) + 0.5 * (x * y) ** 2
+    
+def f_func2(x,y):
+    return x**2 + y**2
 
 # LHS of a discretized Poisson problem
 def Amult(U, m):
@@ -106,7 +114,8 @@ def vcycle(A, R, P, u, f, l):
 
 # multi grid loop
 outer_iterations = []
-for l in range(5, 12):
+maxlevel = int(sys.argv[1])
+for l in range(5, maxlevel):
     m = 2**l - 1
     print(f"m = {m}")
     x = np.linspace(0, 1, m)
@@ -118,7 +127,7 @@ for l in range(5, 12):
             assert U0[i,j] - U0.reshape(-1)[i + j*m] < 1e-15
 
     U0 = U0.reshape(-1)
-    F = form_rhs(m, f_func, u_func)
+    F = form_rhs(m, f_func2, u_func2)
     assert F.shape == U0.shape
 
     nmax = 50
@@ -126,7 +135,7 @@ for l in range(5, 12):
     n = 0
     rn = F - Amult(U0, m)  # residual r = f - Δ_h u
     Un = np.copy(U0)
-    EPS = 1e-8
+    EPS = 1e-5
     for n in range(nmax):
         norm = l2_norm_grid(rn, 1/(m+1)) # h = 1/m+1
         # print(f"{n} -> ||r||_2: {norm}")
@@ -140,10 +149,11 @@ for l in range(5, 12):
     else:
         outer_iterations.append(n+1)
         print(f"Stopped at max iter: {n + 1}")
-        
-# plt.plot(list(range(5,10)), outer_iterations, '-o')
-# plt.xlabel('k')
-# plt.ylabel('# Iterations to reach error tolerance')
-# plt.title('Iterations to convergence on grid $m=2^k - 1$')
-# plt.grid(True)
-# plt.show()
+
+if (len(sys.argv) == 3) and (sys.argv[2] == 'plot'):   
+    plt.plot(list(range(5,maxlevel)), outer_iterations, '-o')
+    plt.xlabel('k')
+    plt.ylabel('# Iterations to reach error tolerance')
+    plt.title('Iterations to convergence on grid $m=2^k - 1$')
+    plt.grid(True)
+    plt.show()
