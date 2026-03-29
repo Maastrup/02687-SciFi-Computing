@@ -114,7 +114,7 @@ def vcycle(A, R, P, u, f, l):
     return u
 
 # multi grid loop
-l = 3
+l = 5 # levels
 m = 2**l - 1
 print(f"m = {m}")
 x = np.linspace(0, 1, m)
