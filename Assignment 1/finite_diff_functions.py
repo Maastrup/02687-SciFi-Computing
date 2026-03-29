@@ -97,6 +97,15 @@ def smooth(U, omega, m, F):
 
     return Unew
 
+def vec_smooth(U, omega, m, F):
+    h = 1/ (m+1)
+    Ugrid = U.reshape(m,m)
+    Fgrid = F.reshape(m,m)
+    Ugrid[1:-1, 1:-1] = 0.25 * (Ugrid[:-2, 1:-1] + Ugrid[1:-1, :-2]
+                       + Ugrid[2:, 1:-1] + Ugrid[1:-1, 2:]
+                       - 4 * Ugrid[1:-1, 1:-1] - h**2 * Fgrid[1:-1, 1]
+    )
+    return Ugrid.reshape(-1)
 
 def coarsen(R, m):
     mc = m // 2
@@ -154,7 +163,6 @@ def scatter(Rc, m):
             se = i + 1 + (j+1) * m
             corners = np.array([nw, ne, sw, se])
             cross = np.array([n, s, w, e])
-            center = i + j*m
 
             center_val = Rc[ic + jc*mc]
             fine[corners] += 1/4 * center_val
