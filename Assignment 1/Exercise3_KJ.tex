@@ -1,0 +1,792 @@
+\documentclass[11pt]{article}
+
+    \usepackage[breakable]{tcolorbox}
+    \usepackage{parskip} % Stop auto-indenting (to mimic markdown behaviour)
+    
+
+    % Basic figure setup, for now with no caption control since it's done
+    % automatically by Pandoc (which extracts ![](path) syntax from Markdown).
+    \usepackage{graphicx}
+    % Maintain compatibility with old templates. Remove in nbconvert 6.0
+    \let\Oldincludegraphics\includegraphics
+    % Ensure that by default, figures have no caption (until we provide a
+    % proper Figure object with a Caption API and a way to capture that
+    % in the conversion process - todo).
+    \usepackage{caption}
+    \DeclareCaptionFormat{nocaption}{}
+    \captionsetup{format=nocaption,aboveskip=0pt,belowskip=0pt}
+
+    \usepackage{float}
+    \floatplacement{figure}{H} % forces figures to be placed at the correct location
+    \usepackage{xcolor} % Allow colors to be defined
+    \usepackage{enumerate} % Needed for markdown enumerations to work
+    \usepackage{geometry} % Used to adjust the document margins
+    \usepackage{amsmath} % Equations
+    \usepackage{amssymb} % Equations
+    \usepackage{textcomp} % defines textquotesingle
+    % Hack from http://tex.stackexchange.com/a/47451/13684:
+    \AtBeginDocument{%
+        \def\PYZsq{\textquotesingle}% Upright quotes in Pygmentized code
+    }
+    \usepackage{upquote} % Upright quotes for verbatim code
+    \usepackage{eurosym} % defines \euro
+
+    \usepackage{iftex}
+    \ifPDFTeX
+        \usepackage[T1]{fontenc}
+        \IfFileExists{alphabeta.sty}{
+              \usepackage{alphabeta}
+          }{
+              \usepackage[mathletters]{ucs}
+              \usepackage[utf8x]{inputenc}
+          }
+    \else
+        \usepackage{fontspec}
+        \usepackage{unicode-math}
+    \fi
+
+    \usepackage{fancyvrb} % verbatim replacement that allows latex
+    \usepackage{grffile} % extends the file name processing of package graphics
+                         % to support a larger range
+    \makeatletter % fix for old versions of grffile with XeLaTeX
+    \@ifpackagelater{grffile}{2019/11/01}
+    {
+      % Do nothing on new versions
+    }
+    {
+      \def\Gread@@xetex#1{%
+        \IfFileExists{"\Gin@base".bb}%
+        {\Gread@eps{\Gin@base.bb}}%
+        {\Gread@@xetex@aux#1}%
+      }
+    }
+    \makeatother
+    \usepackage[Export]{adjustbox} % Used to constrain images to a maximum size
+    \adjustboxset{max size={0.9\linewidth}{0.9\paperheight}}
+
+    % The hyperref package gives us a pdf with properly built
+    % internal navigation ('pdf bookmarks' for the table of contents,
+    % internal cross-reference links, web links for URLs, etc.)
+    \usepackage{hyperref}
+    % The default LaTeX title has an obnoxious amount of whitespace. By default,
+    % titling removes some of it. It also provides customization options.
+    \usepackage{titling}
+    \usepackage{longtable} % longtable support required by pandoc >1.10
+    \usepackage{booktabs}  % table support for pandoc > 1.12.2
+    \usepackage{array}     % table support for pandoc >= 2.11.3
+    \usepackage{calc}      % table minipage width calculation for pandoc >= 2.11.1
+    \usepackage[inline]{enumitem} % IRkernel/repr support (it uses the enumerate* environment)
+    \usepackage[normalem]{ulem} % ulem is needed to support strikethroughs (\sout)
+                                % normalem makes italics be italics, not underlines
+    \usepackage{mathrsfs}
+    
+
+    
+    % Colors for the hyperref package
+    \definecolor{urlcolor}{rgb}{0,.145,.698}
+    \definecolor{linkcolor}{rgb}{.71,0.21,0.01}
+    \definecolor{citecolor}{rgb}{.12,.54,.11}
+
+    % ANSI colors
+    \definecolor{ansi-black}{HTML}{3E424D}
+    \definecolor{ansi-black-intense}{HTML}{282C36}
+    \definecolor{ansi-red}{HTML}{E75C58}
+    \definecolor{ansi-red-intense}{HTML}{B22B31}
+    \definecolor{ansi-green}{HTML}{00A250}
+    \definecolor{ansi-green-intense}{HTML}{007427}
+    \definecolor{ansi-yellow}{HTML}{DDB62B}
+    \definecolor{ansi-yellow-intense}{HTML}{B27D12}
+    \definecolor{ansi-blue}{HTML}{208FFB}
+    \definecolor{ansi-blue-intense}{HTML}{0065CA}
+    \definecolor{ansi-magenta}{HTML}{D160C4}
+    \definecolor{ansi-magenta-intense}{HTML}{A03196}
+    \definecolor{ansi-cyan}{HTML}{60C6C8}
+    \definecolor{ansi-cyan-intense}{HTML}{258F8F}
+    \definecolor{ansi-white}{HTML}{C5C1B4}
+    \definecolor{ansi-white-intense}{HTML}{A1A6B2}
+    \definecolor{ansi-default-inverse-fg}{HTML}{FFFFFF}
+    \definecolor{ansi-default-inverse-bg}{HTML}{000000}
+
+    % common color for the border for error outputs.
+    \definecolor{outerrorbackground}{HTML}{FFDFDF}
+
+    % commands and environments needed by pandoc snippets
+    % extracted from the output of `pandoc -s`
+    \providecommand{\tightlist}{%
+      \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+    \DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+    % Add ',fontsize=\small' for more characters per line
+    \newenvironment{Shaded}{}{}
+    \newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.56,0.13,0.00}{{#1}}}
+    \newcommand{\DecValTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\FloatTok}[1]{\textcolor[rgb]{0.25,0.63,0.44}{{#1}}}
+    \newcommand{\CharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\StringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\CommentTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textit{{#1}}}}
+    \newcommand{\OtherTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{{#1}}}
+    \newcommand{\AlertTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.02,0.16,0.49}{{#1}}}
+    \newcommand{\RegionMarkerTok}[1]{{#1}}
+    \newcommand{\ErrorTok}[1]{\textcolor[rgb]{1.00,0.00,0.00}{\textbf{{#1}}}}
+    \newcommand{\NormalTok}[1]{{#1}}
+
+    % Additional commands for more recent versions of Pandoc
+    \newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.53,0.00,0.00}{{#1}}}
+    \newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.25,0.44,0.63}{{#1}}}
+    \newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.73,0.40,0.53}{{#1}}}
+    \newcommand{\ImportTok}[1]{{#1}}
+    \newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.73,0.13,0.13}{\textit{{#1}}}}
+    \newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\VariableTok}[1]{\textcolor[rgb]{0.10,0.09,0.49}{{#1}}}
+    \newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.00,0.44,0.13}{\textbf{{#1}}}}
+    \newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.40,0.40,0.40}{{#1}}}
+    \newcommand{\BuiltInTok}[1]{{#1}}
+    \newcommand{\ExtensionTok}[1]{{#1}}
+    \newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.74,0.48,0.00}{{#1}}}
+    \newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.49,0.56,0.16}{{#1}}}
+    \newcommand{\InformationTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+    \newcommand{\WarningTok}[1]{\textcolor[rgb]{0.38,0.63,0.69}{\textbf{\textit{{#1}}}}}
+
+
+    % Define a nice break command that doesn't care if a line doesn't already
+    % exist.
+    \def\br{\hspace*{\fill} \\* }
+    % Math Jax compatibility definitions
+    \def\gt{>}
+    \def\lt{<}
+    \let\Oldtex\TeX
+    \let\Oldlatex\LaTeX
+    \renewcommand{\TeX}{\textrm{\Oldtex}}
+    \renewcommand{\LaTeX}{\textrm{\Oldlatex}}
+    % Document parameters
+    % Document title
+    \title{Exercise3\_KJ}
+    
+    
+    
+    
+    
+% Pygments definitions
+\makeatletter
+\def\PY@reset{\let\PY@it=\relax \let\PY@bf=\relax%
+    \let\PY@ul=\relax \let\PY@tc=\relax%
+    \let\PY@bc=\relax \let\PY@ff=\relax}
+\def\PY@tok#1{\csname PY@tok@#1\endcsname}
+\def\PY@toks#1+{\ifx\relax#1\empty\else%
+    \PY@tok{#1}\expandafter\PY@toks\fi}
+\def\PY@do#1{\PY@bc{\PY@tc{\PY@ul{%
+    \PY@it{\PY@bf{\PY@ff{#1}}}}}}}
+\def\PY#1#2{\PY@reset\PY@toks#1+\relax+\PY@do{#2}}
+
+\@namedef{PY@tok@w}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.73,0.73}{##1}}}
+\@namedef{PY@tok@c}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cp}{\def\PY@tc##1{\textcolor[rgb]{0.61,0.40,0.00}{##1}}}
+\@namedef{PY@tok@k}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kp}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kt}{\def\PY@tc##1{\textcolor[rgb]{0.69,0.00,0.25}{##1}}}
+\@namedef{PY@tok@o}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@ow}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\@namedef{PY@tok@nb}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@nf}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@nc}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@nn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@ne}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.80,0.25,0.22}{##1}}}
+\@namedef{PY@tok@nv}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@no}{\def\PY@tc##1{\textcolor[rgb]{0.53,0.00,0.00}{##1}}}
+\@namedef{PY@tok@nl}{\def\PY@tc##1{\textcolor[rgb]{0.46,0.46,0.00}{##1}}}
+\@namedef{PY@tok@ni}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.44,0.44,0.44}{##1}}}
+\@namedef{PY@tok@na}{\def\PY@tc##1{\textcolor[rgb]{0.41,0.47,0.13}{##1}}}
+\@namedef{PY@tok@nt}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@nd}{\def\PY@tc##1{\textcolor[rgb]{0.67,0.13,1.00}{##1}}}
+\@namedef{PY@tok@s}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sd}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@si}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.64,0.35,0.47}{##1}}}
+\@namedef{PY@tok@se}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.67,0.36,0.12}{##1}}}
+\@namedef{PY@tok@sr}{\def\PY@tc##1{\textcolor[rgb]{0.64,0.35,0.47}{##1}}}
+\@namedef{PY@tok@ss}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@sx}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@m}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@gh}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{PY@tok@gu}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.50,0.00,0.50}{##1}}}
+\@namedef{PY@tok@gd}{\def\PY@tc##1{\textcolor[rgb]{0.63,0.00,0.00}{##1}}}
+\@namedef{PY@tok@gi}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.52,0.00}{##1}}}
+\@namedef{PY@tok@gr}{\def\PY@tc##1{\textcolor[rgb]{0.89,0.00,0.00}{##1}}}
+\@namedef{PY@tok@ge}{\let\PY@it=\textit}
+\@namedef{PY@tok@gs}{\let\PY@bf=\textbf}
+\@namedef{PY@tok@gp}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,0.50}{##1}}}
+\@namedef{PY@tok@go}{\def\PY@tc##1{\textcolor[rgb]{0.44,0.44,0.44}{##1}}}
+\@namedef{PY@tok@gt}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.27,0.87}{##1}}}
+\@namedef{PY@tok@err}{\def\PY@bc##1{{\setlength{\fboxsep}{\string -\fboxrule}\fcolorbox[rgb]{1.00,0.00,0.00}{1,1,1}{\strut ##1}}}}
+\@namedef{PY@tok@kc}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kd}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kn}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@kr}{\let\PY@bf=\textbf\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@bp}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.50,0.00}{##1}}}
+\@namedef{PY@tok@fm}{\def\PY@tc##1{\textcolor[rgb]{0.00,0.00,1.00}{##1}}}
+\@namedef{PY@tok@vc}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vg}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vi}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@vm}{\def\PY@tc##1{\textcolor[rgb]{0.10,0.09,0.49}{##1}}}
+\@namedef{PY@tok@sa}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sb}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sc}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@dl}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@s2}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@sh}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@s1}{\def\PY@tc##1{\textcolor[rgb]{0.73,0.13,0.13}{##1}}}
+\@namedef{PY@tok@mb}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mf}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mh}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mi}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@il}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@mo}{\def\PY@tc##1{\textcolor[rgb]{0.40,0.40,0.40}{##1}}}
+\@namedef{PY@tok@ch}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cm}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cpf}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@c1}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+\@namedef{PY@tok@cs}{\let\PY@it=\textit\def\PY@tc##1{\textcolor[rgb]{0.24,0.48,0.48}{##1}}}
+
+\def\PYZbs{\char`\\}
+\def\PYZus{\char`\_}
+\def\PYZob{\char`\{}
+\def\PYZcb{\char`\}}
+\def\PYZca{\char`\^}
+\def\PYZam{\char`\&}
+\def\PYZlt{\char`\<}
+\def\PYZgt{\char`\>}
+\def\PYZsh{\char`\#}
+\def\PYZpc{\char`\%}
+\def\PYZdl{\char`\$}
+\def\PYZhy{\char`\-}
+\def\PYZsq{\char`\'}
+\def\PYZdq{\char`\"}
+\def\PYZti{\char`\~}
+% for compatibility with earlier versions
+\def\PYZat{@}
+\def\PYZlb{[}
+\def\PYZrb{]}
+\makeatother
+
+
+    % For linebreaks inside Verbatim environment from package fancyvrb.
+    \makeatletter
+        \newbox\Wrappedcontinuationbox
+        \newbox\Wrappedvisiblespacebox
+        \newcommand*\Wrappedvisiblespace {\textcolor{red}{\textvisiblespace}}
+        \newcommand*\Wrappedcontinuationsymbol {\textcolor{red}{\llap{\tiny$\m@th\hookrightarrow$}}}
+        \newcommand*\Wrappedcontinuationindent {3ex }
+        \newcommand*\Wrappedafterbreak {\kern\Wrappedcontinuationindent\copy\Wrappedcontinuationbox}
+        % Take advantage of the already applied Pygments mark-up to insert
+        % potential linebreaks for TeX processing.
+        %        {, <, #, %, $, ' and ": go to next line.
+        %        _, }, ^, &, >, - and ~: stay at end of broken line.
+        % Use of \textquotesingle for straight quote.
+        \newcommand*\Wrappedbreaksatspecials {%
+            \def\PYGZus{\discretionary{\char`\_}{\Wrappedafterbreak}{\char`\_}}%
+            \def\PYGZob{\discretionary{}{\Wrappedafterbreak\char`\{}{\char`\{}}%
+            \def\PYGZcb{\discretionary{\char`\}}{\Wrappedafterbreak}{\char`\}}}%
+            \def\PYGZca{\discretionary{\char`\^}{\Wrappedafterbreak}{\char`\^}}%
+            \def\PYGZam{\discretionary{\char`\&}{\Wrappedafterbreak}{\char`\&}}%
+            \def\PYGZlt{\discretionary{}{\Wrappedafterbreak\char`\<}{\char`\<}}%
+            \def\PYGZgt{\discretionary{\char`\>}{\Wrappedafterbreak}{\char`\>}}%
+            \def\PYGZsh{\discretionary{}{\Wrappedafterbreak\char`\#}{\char`\#}}%
+            \def\PYGZpc{\discretionary{}{\Wrappedafterbreak\char`\%}{\char`\%}}%
+            \def\PYGZdl{\discretionary{}{\Wrappedafterbreak\char`\$}{\char`\$}}%
+            \def\PYGZhy{\discretionary{\char`\-}{\Wrappedafterbreak}{\char`\-}}%
+            \def\PYGZsq{\discretionary{}{\Wrappedafterbreak\textquotesingle}{\textquotesingle}}%
+            \def\PYGZdq{\discretionary{}{\Wrappedafterbreak\char`\"}{\char`\"}}%
+            \def\PYGZti{\discretionary{\char`\~}{\Wrappedafterbreak}{\char`\~}}%
+        }
+        % Some characters . , ; ? ! / are not pygmentized.
+        % This macro makes them "active" and they will insert potential linebreaks
+        \newcommand*\Wrappedbreaksatpunct {%
+            \lccode`\~`\.\lowercase{\def~}{\discretionary{\hbox{\char`\.}}{\Wrappedafterbreak}{\hbox{\char`\.}}}%
+            \lccode`\~`\,\lowercase{\def~}{\discretionary{\hbox{\char`\,}}{\Wrappedafterbreak}{\hbox{\char`\,}}}%
+            \lccode`\~`\;\lowercase{\def~}{\discretionary{\hbox{\char`\;}}{\Wrappedafterbreak}{\hbox{\char`\;}}}%
+            \lccode`\~`\:\lowercase{\def~}{\discretionary{\hbox{\char`\:}}{\Wrappedafterbreak}{\hbox{\char`\:}}}%
+            \lccode`\~`\?\lowercase{\def~}{\discretionary{\hbox{\char`\?}}{\Wrappedafterbreak}{\hbox{\char`\?}}}%
+            \lccode`\~`\!\lowercase{\def~}{\discretionary{\hbox{\char`\!}}{\Wrappedafterbreak}{\hbox{\char`\!}}}%
+            \lccode`\~`\/\lowercase{\def~}{\discretionary{\hbox{\char`\/}}{\Wrappedafterbreak}{\hbox{\char`\/}}}%
+            \catcode`\.\active
+            \catcode`\,\active
+            \catcode`\;\active
+            \catcode`\:\active
+            \catcode`\?\active
+            \catcode`\!\active
+            \catcode`\/\active
+            \lccode`\~`\~
+        }
+    \makeatother
+
+    \let\OriginalVerbatim=\Verbatim
+    \makeatletter
+    \renewcommand{\Verbatim}[1][1]{%
+        %\parskip\z@skip
+        \sbox\Wrappedcontinuationbox {\Wrappedcontinuationsymbol}%
+        \sbox\Wrappedvisiblespacebox {\FV@SetupFont\Wrappedvisiblespace}%
+        \def\FancyVerbFormatLine ##1{\hsize\linewidth
+            \vtop{\raggedright\hyphenpenalty\z@\exhyphenpenalty\z@
+                \doublehyphendemerits\z@\finalhyphendemerits\z@
+                \strut ##1\strut}%
+        }%
+        % If the linebreak is at a space, the latter will be displayed as visible
+        % space at end of first line, and a continuation symbol starts next line.
+        % Stretch/shrink are however usually zero for typewriter font.
+        \def\FV@Space {%
+            \nobreak\hskip\z@ plus\fontdimen3\font minus\fontdimen4\font
+            \discretionary{\copy\Wrappedvisiblespacebox}{\Wrappedafterbreak}
+            {\kern\fontdimen2\font}%
+        }%
+
+        % Allow breaks at special characters using \PYG... macros.
+        \Wrappedbreaksatspecials
+        % Breaks at punctuation characters . , ; ? ! and / need catcode=\active
+        \OriginalVerbatim[#1,codes*=\Wrappedbreaksatpunct]%
+    }
+    \makeatother
+
+    % Exact colors from NB
+    \definecolor{incolor}{HTML}{303F9F}
+    \definecolor{outcolor}{HTML}{D84315}
+    \definecolor{cellborder}{HTML}{CFCFCF}
+    \definecolor{cellbackground}{HTML}{F7F7F7}
+
+    % prompt
+    \makeatletter
+    \newcommand{\boxspacing}{\kern\kvtcb@left@rule\kern\kvtcb@boxsep}
+    \makeatother
+    \newcommand{\prompt}[4]{
+        {\ttfamily\llap{{\color{#2}[#3]:\hspace{3pt}#4}}\vspace{-\baselineskip}}
+    }
+    
+
+    
+    % Prevent overflowing lines due to hard-to-break entities
+    \sloppy
+    % Setup hyperref package
+    \hypersetup{
+      breaklinks=true,  % so long urls are correctly broken across lines
+      colorlinks=true,
+      urlcolor=urlcolor,
+      linkcolor=linkcolor,
+      citecolor=citecolor,
+      }
+    % Slightly bigger margins than the latex defaults
+    
+    \geometry{verbose,tmargin=1in,bmargin=1in,lmargin=1in,rmargin=1in}
+    
+    
+
+\begin{document}
+    
+    \maketitle
+    
+    
+
+    
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{1}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{import} \PY{n+nn}{numpy} \PY{k}{as} \PY{n+nn}{np}
+\PY{k+kn}{from} \PY{n+nn}{scipy}\PY{n+nn}{.}\PY{n+nn}{sparse} \PY{k+kn}{import} \PY{n}{spdiags}\PY{p}{,} \PY{n}{eye}\PY{p}{,} \PY{n}{kron}
+\PY{k+kn}{from} \PY{n+nn}{scipy}\PY{n+nn}{.}\PY{n+nn}{sparse}\PY{n+nn}{.}\PY{n+nn}{linalg} \PY{k+kn}{import} \PY{n}{spsolve}\PY{p}{,} \PY{n}{cg}\PY{p}{,} \PY{n}{LinearOperator}
+\PY{k+kn}{import} \PY{n+nn}{scipy}\PY{n+nn}{.}\PY{n+nn}{sparse}\PY{n+nn}{.}\PY{n+nn}{linalg} \PY{k}{as} \PY{n+nn}{splinalg}
+\PY{k+kn}{import} \PY{n+nn}{matplotlib}\PY{n+nn}{.}\PY{n+nn}{pyplot} \PY{k}{as} \PY{n+nn}{plt}
+\PY{k+kn}{import} \PY{n+nn}{numba}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{2}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k}{def} \PY{n+nf}{Amult}\PY{p}{(}\PY{n}{U}\PY{p}{,} \PY{n}{m}\PY{p}{)}\PY{p}{:}
+    \PY{n}{AU} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{pad}\PY{p}{(}\PY{n}{U}\PY{o}{.}\PY{n}{reshape}\PY{p}{(}\PY{p}{(}\PY{n}{m}\PY{p}{,} \PY{n}{m}\PY{p}{)}\PY{p}{)}\PY{p}{,} \PY{p}{(}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{,} \PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{constant}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+    \PY{n}{AU}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{:}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{:}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{]} \PY{o}{=} \PYZbs{}
+        \PY{n}{AU}\PY{p}{[}\PY{p}{:}\PY{o}{\PYZhy{}}\PY{l+m+mi}{2}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{:}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{]} \PY{o}{+} \PYZbs{}
+        \PY{n}{AU}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{:}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{,} \PY{p}{:}\PY{o}{\PYZhy{}}\PY{l+m+mi}{2}\PY{p}{]} \PY{o}{+} \PYZbs{}
+        \PY{n}{AU}\PY{p}{[}\PY{l+m+mi}{2}\PY{p}{:}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{:}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{]} \PY{o}{+} \PYZbs{}
+        \PY{n}{AU}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{:}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{2}\PY{p}{:}\PY{p}{]} \PY{o}{\PYZhy{}} \PYZbs{}
+        \PY{l+m+mi}{4} \PY{o}{*} \PY{n}{AU}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{:}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{:}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{]} 
+    \PY{k}{return} \PY{o}{\PYZhy{}} \PY{p}{(}\PY{l+m+mi}{1}\PY{o}{+}\PY{n}{m}\PY{p}{)}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2} \PY{o}{*} \PY{n}{AU}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{:}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{:}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{]}\PY{o}{.}\PY{n}{reshape}\PY{p}{(}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)}
+
+\PY{n}{U} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{,}\PY{l+m+mi}{3}\PY{p}{,}\PY{l+m+mi}{4}\PY{p}{]}\PY{p}{)}
+\PY{n}{m} \PY{o}{=} \PY{l+m+mi}{2}
+\PY{n}{Amult}\PY{p}{(}\PY{n}{U}\PY{p}{,} \PY{n}{m}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+            \begin{tcolorbox}[breakable, size=fbox, boxrule=.5pt, pad at break*=1mm, opacityfill=0]
+\prompt{Out}{outcolor}{2}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+array([-9, 27, 63, 99])
+\end{Verbatim}
+\end{tcolorbox}
+        
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{3}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k}{def} \PY{n+nf}{u\PYZus{}func}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{y}\PY{p}{)}\PY{p}{:}
+    \PY{k}{return} \PY{n}{np}\PY{o}{.}\PY{n}{sin}\PY{p}{(}\PY{l+m+mi}{4}\PY{o}{*}\PY{n}{np}\PY{o}{.}\PY{n}{pi}\PY{o}{*}\PY{p}{(}\PY{n}{x}\PY{o}{+}\PY{n}{y}\PY{p}{)}\PY{p}{)} \PY{o}{+} \PY{n}{np}\PY{o}{.}\PY{n}{cos}\PY{p}{(}\PY{l+m+mi}{4}\PY{o}{*}\PY{n}{np}\PY{o}{.}\PY{n}{pi}\PY{o}{*}\PY{n}{x}\PY{o}{*}\PY{n}{y}\PY{p}{)}
+
+\PY{k}{def} \PY{n+nf}{f\PYZus{}func}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{y}\PY{p}{)}\PY{p}{:}
+    \PY{n}{term1} \PY{o}{=} \PY{o}{\PYZhy{}}\PY{l+m+mi}{32}\PY{o}{*}\PY{n}{np}\PY{o}{.}\PY{n}{pi}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{o}{*}\PY{n}{np}\PY{o}{.}\PY{n}{sin}\PY{p}{(}\PY{l+m+mi}{4}\PY{o}{*}\PY{n}{np}\PY{o}{.}\PY{n}{pi}\PY{o}{*}\PY{p}{(}\PY{n}{x}\PY{o}{+}\PY{n}{y}\PY{p}{)}\PY{p}{)}
+    \PY{n}{term2} \PY{o}{=} \PY{o}{\PYZhy{}}\PY{l+m+mi}{16}\PY{o}{*}\PY{n}{np}\PY{o}{.}\PY{n}{pi}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{o}{*}\PY{p}{(}\PY{n}{x}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2} \PY{o}{+} \PY{n}{y}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)}\PY{o}{*}\PY{n}{np}\PY{o}{.}\PY{n}{cos}\PY{p}{(}\PY{l+m+mi}{4}\PY{o}{*}\PY{n}{np}\PY{o}{.}\PY{n}{pi}\PY{o}{*}\PY{n}{x}\PY{o}{*}\PY{n}{y}\PY{p}{)}
+    \PY{k}{return} \PY{n}{term1} \PY{o}{+} \PY{n}{term2}
+
+\PY{k}{def} \PY{n+nf}{form\PYZus{}rhs}\PY{p}{(}\PY{n}{m}\PY{p}{,} \PY{n}{f\PYZus{}func}\PY{p}{,} \PY{n}{u\PYZus{}func}\PY{p}{)}\PY{p}{:}
+
+    \PY{n}{h} \PY{o}{=} \PY{l+m+mf}{1.0}\PY{o}{/}\PY{p}{(}\PY{n}{m}\PY{o}{+}\PY{l+m+mi}{1}\PY{p}{)}
+    \PY{n}{b} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{zeros}\PY{p}{(}\PY{n}{m}\PY{o}{*}\PY{n}{m}\PY{p}{)}
+
+    \PY{k}{for} \PY{n}{j} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,} \PY{n}{m}\PY{o}{+}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{:}
+        \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,} \PY{n}{m}\PY{o}{+}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{:}
+
+            \PY{n}{k} \PY{o}{=} \PY{p}{(}\PY{n}{j}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)}\PY{o}{*}\PY{n}{m} \PY{o}{+} \PY{p}{(}\PY{n}{i}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)}
+            \PY{n}{x} \PY{o}{=} \PY{n}{i}\PY{o}{*}\PY{n}{h}
+            \PY{n}{y} \PY{o}{=} \PY{n}{j}\PY{o}{*}\PY{n}{h}
+
+            \PY{n}{b}\PY{p}{[}\PY{n}{k}\PY{p}{]} \PY{o}{=} \PY{n}{f\PYZus{}func}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{n}{y}\PY{p}{)}
+
+            \PY{c+c1}{\PYZsh{} left boundary}
+            \PY{k}{if} \PY{n}{i} \PY{o}{==} \PY{l+m+mi}{1}\PY{p}{:}
+                \PY{n}{b}\PY{p}{[}\PY{n}{k}\PY{p}{]} \PY{o}{\PYZhy{}}\PY{o}{=} \PY{n}{u\PYZus{}func}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,}\PY{n}{y}\PY{p}{)}\PY{o}{/}\PY{n}{h}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}
+
+            \PY{c+c1}{\PYZsh{} right boundary}
+            \PY{k}{if} \PY{n}{i} \PY{o}{==} \PY{n}{m}\PY{p}{:}
+                \PY{n}{b}\PY{p}{[}\PY{n}{k}\PY{p}{]} \PY{o}{\PYZhy{}}\PY{o}{=} \PY{n}{u\PYZus{}func}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,}\PY{n}{y}\PY{p}{)}\PY{o}{/}\PY{n}{h}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}
+
+            \PY{c+c1}{\PYZsh{} bottom boundary}
+            \PY{k}{if} \PY{n}{j} \PY{o}{==} \PY{l+m+mi}{1}\PY{p}{:}
+                \PY{n}{b}\PY{p}{[}\PY{n}{k}\PY{p}{]} \PY{o}{\PYZhy{}}\PY{o}{=} \PY{n}{u\PYZus{}func}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{l+m+mi}{0}\PY{p}{)}\PY{o}{/}\PY{n}{h}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}
+
+            \PY{c+c1}{\PYZsh{} top boundary}
+            \PY{k}{if} \PY{n}{j} \PY{o}{==} \PY{n}{m}\PY{p}{:}
+                \PY{n}{b}\PY{p}{[}\PY{n}{k}\PY{p}{]} \PY{o}{\PYZhy{}}\PY{o}{=} \PY{n}{u\PYZus{}func}\PY{p}{(}\PY{n}{x}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{)}\PY{o}{/}\PY{n}{h}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}
+
+    \PY{k}{return} \PY{n}{b}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{4}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{c+c1}{\PYZsh{}ms = [3, 4, 10, 25, 50]}
+\PY{n}{m} \PY{o}{=} \PY{l+m+mi}{25}
+
+\PY{n}{errs} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+
+
+\PY{n}{h} \PY{o}{=} \PY{l+m+mi}{1} \PY{o}{/} \PY{p}{(}\PY{n}{m} \PY{o}{+} \PY{l+m+mi}{1}\PY{p}{)}
+
+\PY{n}{F} \PY{o}{=} \PY{n}{form\PYZus{}rhs}\PY{p}{(}\PY{n}{m}\PY{p}{,}\PY{n}{f\PYZus{}func}\PY{p}{,}\PY{n}{u\PYZus{}func}\PY{p}{)}
+\PY{n}{Aminus} \PY{o}{=} \PY{n}{LinearOperator}\PY{p}{(}
+    \PY{n}{shape}\PY{o}{=}\PY{p}{(}\PY{n}{m}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{,} \PY{n}{m}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)}\PY{p}{,} 
+    \PY{n}{matvec}\PY{o}{=}\PY{k}{lambda} \PY{n}{U}\PY{p}{:} \PY{n}{Amult}\PY{p}{(}\PY{n}{U}\PY{p}{,} \PY{n}{m}\PY{p}{)}\PY{p}{,}
+    \PY{n}{dtype}\PY{o}{=}\PY{n}{np}\PY{o}{.}\PY{n}{float64}
+\PY{p}{)}
+
+\PY{n}{residual\PYZus{}norms} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+\PY{k}{def} \PY{n+nf}{residual\PYZus{}norm}\PY{p}{(}\PY{n}{xk}\PY{p}{)}\PY{p}{:}
+    \PY{n}{r\PYZus{}norm} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{linalg}\PY{o}{.}\PY{n}{norm}\PY{p}{(}\PY{n}{F} \PY{o}{+} \PY{n}{Aminus} \PY{o}{@} \PY{n}{xk}\PY{p}{)}
+    \PY{n}{residual\PYZus{}norms}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{r\PYZus{}norm}\PY{p}{)}
+
+\PY{n}{v}\PY{p}{,} \PY{n}{info} \PY{o}{=} \PY{n}{cg}\PY{p}{(}\PY{n}{Aminus}\PY{p}{,} \PY{o}{\PYZhy{}}\PY{n}{F}\PY{p}{,} \PY{n}{rtol} \PY{o}{=} \PY{l+m+mf}{1e\PYZhy{}10}\PY{p}{,} \PY{n}{callback} \PY{o}{=} \PY{n}{residual\PYZus{}norm}\PY{p}{)}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZob{}}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Successful}\PY{l+s+s2}{\PYZdq{}} \PY{k}{if} \PY{n}{info} \PY{o}{==} \PY{l+m+mi}{0} \PY{k}{else} \PY{n+nb}{str}\PY{p}{(}\PY{n}{info}\PY{p}{)} \PY{o}{+} \PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{ iterations}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+
+\PY{n}{plt}\PY{o}{.}\PY{n}{semilogy}\PY{p}{(}\PY{n}{residual\PYZus{}norms}\PY{p}{,} \PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{o\PYZhy{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{xlabel}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Iteration k}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{ylabel}\PY{p}{(}\PY{l+s+sa}{r}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{\PYZdl{}||r\PYZus{}k||\PYZus{}2\PYZdl{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{grid}\PY{p}{(}\PY{k+kc}{True}\PY{p}{,} \PY{n}{which}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{both}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{title}\PY{p}{(}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{Convergence of Conjugate Gradient method}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{show}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+Successful
+    \end{Verbatim}
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Exercise3_KJ_files/Exercise3_KJ_3_1.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    Relaxed iteration matrix: \[
+G_{\omega} = (1 - \omega) I + \omega G
+\]
+
+where OG iteration matrix in Jacobi iterations is \[
+G_J = I - D^{-1}A
+\] with \(A\) is the system matrix for the discretized system.
+
+Eigenvalues of iteration matrix \(G\) from Leveque: \[
+\lambda_{p,q} = 
+\]
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k}{def} \PY{n+nf}{eigen\PYZus{}part}\PY{p}{(}\PY{n}{h}\PY{p}{,} \PY{n}{p}\PY{p}{,} \PY{n}{q}\PY{p}{)}\PY{p}{:}
+    \PY{c+c1}{\PYZsh{} G = I + D**(\PYZhy{}1) * A =\PYZgt{} lmb = 1 + h**2 / 4 (2 / h**2 * lmb(A))}
+    \PY{c+c1}{\PYZsh{}                     =\PYZgt{} lmb = 1 + lmb(A)}
+    \PY{k}{return} \PY{l+m+mi}{1} \PY{o}{+} \PY{l+m+mf}{0.5} \PY{o}{*} \PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{cos}\PY{p}{(}\PY{n}{p}\PY{o}{*}\PY{n}{np}\PY{o}{.}\PY{n}{pi}\PY{o}{*}\PY{n}{h}\PY{p}{)} \PY{o}{+} \PY{n}{np}\PY{o}{.}\PY{n}{cos}\PY{p}{(}\PY{n}{q}\PY{o}{*}\PY{n}{np}\PY{o}{.}\PY{n}{pi}\PY{o}{*}\PY{n}{h}\PY{p}{)} \PY{o}{\PYZhy{}} \PY{l+m+mi}{2}\PY{p}{)}
+
+\PY{k}{def} \PY{n+nf}{gamma}\PY{p}{(}\PY{n}{eigen\PYZus{}part}\PY{p}{,} \PY{n}{omegas}\PY{p}{)}\PY{p}{:}
+    \PY{n}{shape\PYZus{}form} \PY{o}{=} \PY{p}{(}\PY{o}{*}\PY{n}{omegas}\PY{o}{.}\PY{n}{shape}\PY{p}{,} \PY{o}{*}\PY{n}{eigen\PYZus{}part}\PY{o}{.}\PY{n}{shape}\PY{p}{)}
+    \PY{n}{g} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{empty}\PY{p}{(}\PY{n}{shape\PYZus{}form}\PY{p}{)}
+    \PY{k}{for} \PY{n}{i}\PY{p}{,}\PY{n}{w} \PY{o+ow}{in} \PY{n+nb}{enumerate}\PY{p}{(}\PY{n}{omegas}\PY{p}{)}\PY{p}{:}
+        \PY{n}{g}\PY{p}{[}\PY{n}{i}\PY{p}{]} \PY{o}{=} \PY{l+m+mi}{1} \PY{o}{\PYZhy{}} \PY{n}{w} \PY{o}{+} \PY{n}{w} \PY{o}{*} \PY{n}{eigen\PYZus{}part}
+
+    \PY{k}{return} \PY{n}{g}
+
+    \PY{c+c1}{\PYZsh{} return np.ones\PYZus{}like(omegas) \PYZhy{} omegas + omegas * eigen\PYZus{}part}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{6}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{n}{omega} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{linspace}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{2}\PY{p}{,} \PY{l+m+mi}{50}\PY{p}{)}
+\PY{k}{for} \PY{n}{m} \PY{o+ow}{in} \PY{p}{[}\PY{l+m+mi}{30}\PY{p}{,} \PY{l+m+mi}{60}\PY{p}{,} \PY{l+m+mi}{200}\PY{p}{]}\PY{p}{:}
+    \PY{n}{h} \PY{o}{=} \PY{l+m+mi}{1} \PY{o}{/} \PY{p}{(}\PY{n}{m} \PY{o}{+} \PY{l+m+mi}{1}\PY{p}{)}
+    \PY{n}{p} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{arange}\PY{p}{(}\PY{n}{m}\PY{o}{/}\PY{o}{/}\PY{l+m+mi}{2}\PY{p}{,} \PY{n}{m}\PY{p}{)}
+    \PY{n}{q} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{arange}\PY{p}{(}\PY{n}{m}\PY{o}{/}\PY{o}{/}\PY{l+m+mi}{2}\PY{p}{,} \PY{n}{m}\PY{p}{)}
+    \PY{n}{P}\PY{p}{,} \PY{n}{Q} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{meshgrid}\PY{p}{(}\PY{n}{p}\PY{p}{,} \PY{n}{q}\PY{p}{)}
+    \PY{n}{ep} \PY{o}{=} \PY{n}{eigen\PYZus{}part}\PY{p}{(}\PY{n}{h}\PY{p}{,} \PY{n}{P}\PY{p}{,} \PY{n}{Q}\PY{p}{)}
+    \PY{n}{max\PYZus{}gamma\PYZus{}at\PYZus{}w} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{max}\PY{p}{(}\PY{n}{np}\PY{o}{.}\PY{n}{abs}\PY{p}{(}\PY{n}{gamma}\PY{p}{(}\PY{n}{ep}\PY{p}{,} \PY{n}{omega}\PY{p}{)}\PY{p}{)}\PY{p}{,} \PY{n}{axis}\PY{o}{=}\PY{p}{(}\PY{l+m+mi}{1}\PY{p}{,}\PY{l+m+mi}{2}\PY{p}{)}\PY{p}{)}
+    \PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{For }\PY{l+s+si}{\PYZob{}}\PY{n}{m}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{, min rho (rho = }\PY{l+s+si}{\PYZob{}}\PY{n}{np}\PY{o}{.}\PY{n}{min}\PY{p}{(}\PY{n}{max\PYZus{}gamma\PYZus{}at\PYZus{}w}\PY{p}{)}\PY{l+s+si}{:}\PY{l+s+s2}{.4f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{) is at omega = }\PY{l+s+si}{\PYZob{}}\PY{n}{omega}\PY{p}{[}\PY{n}{np}\PY{o}{.}\PY{n}{argmin}\PY{p}{(}\PY{n}{max\PYZus{}gamma\PYZus{}at\PYZus{}w}\PY{p}{)}\PY{p}{]}\PY{l+s+si}{:}\PY{l+s+s2}{.5f}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+    \PY{n}{plt}\PY{o}{.}\PY{n}{plot}\PY{p}{(}\PY{n}{omega}\PY{p}{,} \PY{n}{max\PYZus{}gamma\PYZus{}at\PYZus{}w}\PY{p}{,} \PY{n}{label}\PY{o}{=}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+si}{\PYZob{}}\PY{n}{m}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{x}\PY{l+s+si}{\PYZob{}}\PY{n}{m}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{ grid domain}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+
+\PY{n}{plt}\PY{o}{.}\PY{n}{xlabel}\PY{p}{(}\PY{l+s+sa}{r}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZdl{}}\PY{l+s+s1}{\PYZbs{}}\PY{l+s+s1}{omega\PYZdl{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{ylabel}\PY{p}{(}\PY{l+s+sa}{r}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{\PYZdl{}}\PY{l+s+s1}{\PYZbs{}}\PY{l+s+s1}{max |}\PY{l+s+s1}{\PYZbs{}}\PY{l+s+s1}{gamma\PYZus{}}\PY{l+s+s1}{\PYZob{}}\PY{l+s+s1}{p,q\PYZcb{}|\PYZdl{}}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{ylim}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mf}{1.5}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{grid}\PY{p}{(}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{title}\PY{p}{(}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{Spectral radius against relaxation parameter}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{legend}\PY{p}{(}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{show}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+For 30, min rho (rho = 0.3736) is at omega = 0.69388
+For 60, min rho (rho = 0.3638) is at omega = 0.65306
+For 200, min rho (rho = 0.3520) is at omega = 0.65306
+    \end{Verbatim}
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Exercise3_KJ_files/Exercise3_KJ_6_1.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    \section{\texorpdfstring{Recast \texttt{Amult} to return \(A\mathbf U\)
+not
+\(-A\mathbf U\)}{Recast Amult to return A\textbackslash mathbf U not -A\textbackslash mathbf U}}\label{recast-amult-to-return-amathbf-u-not--amathbf-u}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{22}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{c+c1}{\PYZsh{} LHS of a discretized Poisson problem}
+\PY{k}{def} \PY{n+nf}{Amult}\PY{p}{(}\PY{n}{U}\PY{p}{,} \PY{n}{m}\PY{p}{)}\PY{p}{:}
+    \PY{n}{h} \PY{o}{=} \PY{l+m+mf}{1.0} \PY{o}{/} \PY{p}{(}\PY{n}{m} \PY{o}{+} \PY{l+m+mi}{1}\PY{p}{)}
+    \PY{n}{AU} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{zeros\PYZus{}like}\PY{p}{(}\PY{n}{U}\PY{p}{)}
+
+    \PY{k}{for} \PY{n}{j} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{m}\PY{p}{)}\PY{p}{:}
+        \PY{k}{for} \PY{n}{i} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{m}\PY{p}{)}\PY{p}{:}
+            \PY{n}{k} \PY{o}{=} \PY{n}{i} \PY{o}{+} \PY{n}{j}\PY{o}{*}\PY{n}{m}   \PY{c+c1}{\PYZsh{} 2D \PYZhy{}\PYZgt{} 1D index}
+            
+            \PY{n}{center} \PY{o}{=} \PY{n}{U}\PY{p}{[}\PY{n}{k}\PY{p}{]}
+
+            \PY{n}{left} \PY{o}{=} \PY{n}{U}\PY{p}{[}\PY{n}{k}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{]} \PY{k}{if} \PY{n}{i} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0} \PY{k}{else} \PY{l+m+mf}{0.0}
+            \PY{n}{right} \PY{o}{=} \PY{n}{U}\PY{p}{[}\PY{n}{k}\PY{o}{+}\PY{l+m+mi}{1}\PY{p}{]} \PY{k}{if} \PY{n}{i} \PY{o}{\PYZlt{}} \PY{n}{m} \PY{o}{\PYZhy{}} \PY{l+m+mi}{1} \PY{k}{else} \PY{l+m+mf}{0.0}
+            \PY{n}{down} \PY{o}{=} \PY{n}{U}\PY{p}{[}\PY{n}{k}\PY{o}{\PYZhy{}}\PY{n}{m}\PY{p}{]} \PY{k}{if} \PY{n}{j} \PY{o}{\PYZgt{}} \PY{l+m+mi}{0} \PY{k}{else} \PY{l+m+mf}{0.0}
+            \PY{n}{up} \PY{o}{=} \PY{n}{U}\PY{p}{[}\PY{n}{k}\PY{o}{+}\PY{n}{m}\PY{p}{]} \PY{k}{if} \PY{n}{j} \PY{o}{\PYZlt{}} \PY{n}{m} \PY{o}{\PYZhy{}} \PY{l+m+mi}{1} \PY{k}{else} \PY{l+m+mf}{0.0}
+
+            \PY{c+c1}{\PYZsh{} Discrete Laplacian (Δ\PYZus{}h): (neighbors \PYZhy{} 4*center)/h\PYZca{}2}
+            \PY{n}{AU}\PY{p}{[}\PY{n}{k}\PY{p}{]} \PY{o}{=} \PY{p}{(}\PY{n}{left} \PY{o}{+} \PY{n}{right} \PY{o}{+} \PY{n}{down} \PY{o}{+} \PY{n}{up} \PY{o}{\PYZhy{}} \PY{l+m+mi}{4} \PY{o}{*} \PY{n}{center}\PY{p}{)} \PY{o}{/} \PY{n}{h}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}
+
+    \PY{k}{return} \PY{n}{AU}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \section{restriction and prolongation
+operations}\label{restriction-and-prolongation-operations}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{23}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k+kn}{from} \PY{n+nn}{finite\PYZus{}diff\PYZus{}functions} \PY{k+kn}{import} \PY{n}{smooth}\PY{p}{,} \PY{n}{l2\PYZus{}norm\PYZus{}grid}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k}{def} \PY{n+nf}{coarsen}\PY{p}{(}\PY{n}{R}\PY{p}{,} \PY{n}{m}\PY{p}{)}\PY{p}{:}
+    \PY{n}{mc} \PY{o}{=} \PY{n}{m} \PY{o}{/}\PY{o}{/} \PY{l+m+mi}{2}
+    \PY{n}{Rc} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{empty}\PY{p}{(}\PY{n}{mc}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)}
+
+    \PY{c+c1}{\PYZsh{} Half weighting}
+    \PY{k}{for} \PY{n}{ic} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{mc}\PY{p}{)}\PY{p}{:}
+        \PY{k}{for} \PY{n}{jc} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{mc}\PY{p}{)}\PY{p}{:}
+            \PY{n}{kc} \PY{o}{=} \PY{n}{ic} \PY{o}{+} \PY{n}{jc}\PY{o}{*}\PY{n}{mc}
+            \PY{n}{k} \PY{o}{=} \PY{p}{(}\PY{l+m+mi}{2}\PY{o}{*}\PY{n}{ic} \PY{o}{+} \PY{l+m+mi}{1}\PY{p}{)} \PY{o}{+} \PY{p}{(}\PY{l+m+mi}{2}\PY{o}{*}\PY{n}{jc} \PY{o}{+} \PY{l+m+mi}{1}\PY{p}{)}\PY{o}{*}\PY{n}{m}
+
+            \PY{n}{center} \PY{o}{=} \PY{n}{R}\PY{p}{[}\PY{n}{k}\PY{p}{]}
+            \PY{n}{left}  \PY{o}{=} \PY{n}{R}\PY{p}{[}\PY{n}{k}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{]} 
+            \PY{n}{right} \PY{o}{=} \PY{n}{R}\PY{p}{[}\PY{n}{k}\PY{o}{+}\PY{l+m+mi}{1}\PY{p}{]} 
+            \PY{n}{up}  \PY{o}{=} \PY{n}{R}\PY{p}{[}\PY{n}{k}\PY{o}{\PYZhy{}}\PY{n}{m}\PY{p}{]}   
+            \PY{n}{down}    \PY{o}{=} \PY{n}{R}\PY{p}{[}\PY{n}{k}\PY{o}{+}\PY{n}{m}\PY{p}{]}
+            
+            \PY{n}{Rc}\PY{p}{[}\PY{n}{kc}\PY{p}{]} \PY{o}{=} \PY{l+m+mi}{1} \PY{o}{/} \PY{l+m+mi}{8} \PY{o}{*} \PY{p}{(}
+                \PY{n}{left} \PY{c+c1}{\PYZsh{} (i \PYZhy{} 1, j)}
+                \PY{o}{+} \PY{n}{up} \PY{c+c1}{\PYZsh{} (i, j \PYZhy{} 1)}
+                \PY{o}{+} \PY{l+m+mi}{4} \PY{o}{*} \PY{n}{center} \PY{c+c1}{\PYZsh{} (i, j)}
+                \PY{o}{+} \PY{n}{down} \PY{c+c1}{\PYZsh{} (i, j + 1)}
+                \PY{o}{+} \PY{n}{right} \PY{c+c1}{\PYZsh{} (i + 1, j)}
+            \PY{p}{)}
+    \PY{k}{return} \PY{n}{Rc}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{25}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k}{def} \PY{n+nf}{index\PYZus{}c\PYZus{}to\PYZus{}f}\PY{p}{(}\PY{n}{i}\PY{p}{,}\PY{n}{j}\PY{p}{)}\PY{p}{:}
+    \PY{k}{return} \PY{p}{(}\PY{l+m+mi}{2}\PY{o}{*}\PY{n}{i} \PY{o}{+} \PY{l+m+mi}{1}\PY{p}{,} \PY{l+m+mi}{2}\PY{o}{*}\PY{n}{j} \PY{o}{+} \PY{l+m+mi}{1}\PY{p}{)}
+
+\PY{k}{def} \PY{n+nf}{scatter}\PY{p}{(}\PY{n}{Rc}\PY{p}{,} \PY{n}{m}\PY{p}{)}\PY{p}{:}
+    \PY{n}{mc} \PY{o}{=} \PY{n}{m} \PY{o}{/}\PY{o}{/} \PY{l+m+mi}{2}
+    \PY{n}{fine} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{zeros}\PY{p}{(}\PY{n}{m}\PY{o}{*}\PY{o}{*}\PY{l+m+mi}{2}\PY{p}{)}
+    \PY{n}{fine}\PY{o}{.}\PY{n}{reshape}\PY{p}{(}\PY{n}{m}\PY{p}{,}\PY{n}{m}\PY{p}{)}\PY{p}{[}\PY{l+m+mi}{1}\PY{p}{:}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{:}\PY{p}{:}\PY{l+m+mi}{2}\PY{p}{]} \PY{o}{=} \PY{n}{Rc}\PY{o}{.}\PY{n}{reshape}\PY{p}{(}\PY{n}{mc}\PY{p}{,} \PY{n}{mc}\PY{p}{)}
+    \PY{k}{for} \PY{n}{ic} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{mc}\PY{p}{)}\PY{p}{:}
+        \PY{k}{for} \PY{n}{jc} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{mc}\PY{p}{)}\PY{p}{:}
+            \PY{n}{i}\PY{p}{,} \PY{n}{j} \PY{o}{=} \PY{n}{index\PYZus{}c\PYZus{}to\PYZus{}f}\PY{p}{(}\PY{n}{ic}\PY{p}{,} \PY{n}{jc}\PY{p}{)}
+            \PY{c+c1}{\PYZsh{} fine indexes}
+            \PY{n}{n} \PY{o}{=} \PY{n}{i} \PY{o}{+} \PY{p}{(}\PY{n}{j}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)} \PY{o}{*} \PY{n}{m}
+            \PY{n}{s} \PY{o}{=} \PY{n}{i} \PY{o}{+} \PY{p}{(}\PY{n}{j} \PY{o}{+} \PY{l+m+mi}{1}\PY{p}{)} \PY{o}{*} \PY{n}{m}
+            \PY{n}{w} \PY{o}{=} \PY{n}{i} \PY{o}{\PYZhy{}} \PY{l+m+mi}{1} \PY{o}{+} \PY{n}{j}\PY{o}{*}\PY{n}{m}
+            \PY{n}{e} \PY{o}{=} \PY{n}{i} \PY{o}{+} \PY{l+m+mi}{1} \PY{o}{+} \PY{n}{j}\PY{o}{*}\PY{n}{m}
+            \PY{n}{nw} \PY{o}{=} \PY{n}{i} \PY{o}{\PYZhy{}} \PY{l+m+mi}{1} \PY{o}{+} \PY{p}{(}\PY{n}{j}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)} \PY{o}{*} \PY{n}{m}
+            \PY{n}{ne} \PY{o}{=} \PY{n}{i} \PY{o}{+} \PY{l+m+mi}{1} \PY{o}{+} \PY{p}{(}\PY{n}{j}\PY{o}{\PYZhy{}}\PY{l+m+mi}{1}\PY{p}{)} \PY{o}{*} \PY{n}{m}
+            \PY{n}{sw} \PY{o}{=} \PY{n}{i} \PY{o}{\PYZhy{}} \PY{l+m+mi}{1} \PY{o}{+} \PY{p}{(}\PY{n}{j}\PY{o}{+}\PY{l+m+mi}{1}\PY{p}{)} \PY{o}{*} \PY{n}{m}
+            \PY{n}{se} \PY{o}{=} \PY{n}{i} \PY{o}{+} \PY{l+m+mi}{1} \PY{o}{+} \PY{p}{(}\PY{n}{j}\PY{o}{+}\PY{l+m+mi}{1}\PY{p}{)} \PY{o}{*} \PY{n}{m}
+            \PY{n}{corners} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{nw}\PY{p}{,} \PY{n}{ne}\PY{p}{,} \PY{n}{sw}\PY{p}{,} \PY{n}{se}\PY{p}{]}\PY{p}{)}
+            \PY{n}{cross} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{array}\PY{p}{(}\PY{p}{[}\PY{n}{n}\PY{p}{,} \PY{n}{s}\PY{p}{,} \PY{n}{w}\PY{p}{,} \PY{n}{e}\PY{p}{]}\PY{p}{)}
+
+            \PY{n}{center\PYZus{}val} \PY{o}{=} \PY{n}{Rc}\PY{p}{[}\PY{n}{ic} \PY{o}{+} \PY{n}{jc}\PY{o}{*}\PY{n}{mc}\PY{p}{]}
+            \PY{n}{fine}\PY{p}{[}\PY{n}{corners}\PY{p}{]} \PY{o}{+}\PY{o}{=} \PY{l+m+mi}{1}\PY{o}{/}\PY{l+m+mi}{4} \PY{o}{*} \PY{n}{center\PYZus{}val}
+            \PY{n}{fine}\PY{p}{[}\PY{n}{cross}\PY{p}{]} \PY{o}{+}\PY{o}{=} \PY{l+m+mi}{1}\PY{o}{/}\PY{l+m+mi}{2} \PY{o}{*} \PY{n}{center\PYZus{}val}
+    \PY{k}{return} \PY{n}{fine}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \section{VCycle}\label{vcycle}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{26}{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{k}{def} \PY{n+nf}{vcycle}\PY{p}{(}\PY{n}{A}\PY{p}{,} \PY{n}{R}\PY{p}{,} \PY{n}{P}\PY{p}{,} \PY{n}{u}\PY{p}{,} \PY{n}{f}\PY{p}{,} \PY{n}{l}\PY{p}{)}\PY{p}{:}
+    \PY{l+s+sd}{\PYZsq{}\PYZsq{}\PYZsq{}}
+\PY{l+s+sd}{        \PYZsh{} Parameters}
+\PY{l+s+sd}{            A: A matrix free operator computing discretized Poisson matrix\PYZhy{}vector product A(u) = \PYZhy{}A*u}
+\PY{l+s+sd}{            R: Function | (u, m) \PYZhy{}\PYZgt{} u with len(u) = m//2 Restriction operator coarsening the grid vectors to length m/2 x m/2}
+\PY{l+s+sd}{            P: Function | (u, m) \PYZhy{}\PYZgt{} u with len(u) = m**2 Prolongation operator interpolating grid vectors from length m/2 x m/2 \PYZhy{}\PYZgt{} m x m}
+\PY{l+s+sd}{            u: current guess at solution to Poisson problem}
+\PY{l+s+sd}{            f: RHS of discretized Poisson problem}
+\PY{l+s+sd}{            l: initial number of nodes along x\PYZhy{} and y\PYZhy{}axis}
+\PY{l+s+sd}{        \PYZsh{} Output}
+\PY{l+s+sd}{            u: }
+\PY{l+s+sd}{    \PYZsq{}\PYZsq{}\PYZsq{}}
+    \PY{k}{if} \PY{n}{l} \PY{o}{==} \PY{l+m+mi}{1}\PY{p}{:}
+        \PY{c+c1}{\PYZsh{} l = 1 ==\PYZgt{} A\PYZca{}\PYZhy{}1 = [\PYZhy{}h**2/4] ==\PYZgt{} u = u[0] = \PYZhy{}h**2 / 4 * f[0]}
+        \PY{c+c1}{\PYZsh{} l = 1 ==\PYZgt{} h = 1/2}
+        \PY{c+c1}{\PYZsh{}       ==\PYZgt{} u = u[0] = \PYZhy{}1/8 * f[0]}
+        \PY{n}{u}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]} \PY{o}{=} \PY{o}{\PYZhy{}}\PY{l+m+mi}{1} \PY{o}{/} \PY{l+m+mi}{16} \PY{o}{*} \PY{n}{f}\PY{p}{[}\PY{l+m+mi}{0}\PY{p}{]}
+    \PY{k}{else}\PY{p}{:}
+        \PY{k}{for} \PY{n}{\PYZus{}} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{)}\PY{p}{:} \PY{c+c1}{\PYZsh{} nu\PYZus{}pre in algorithm}
+            \PY{n}{u} \PY{o}{=} \PY{n}{smooth}\PY{p}{(}\PY{n}{u}\PY{p}{,} \PY{l+m+mf}{0.65306}\PY{p}{,} \PY{l+m+mi}{2}\PY{o}{*}\PY{o}{*}\PY{n}{l} \PY{o}{\PYZhy{}} \PY{l+m+mi}{1}\PY{p}{,} \PY{n}{f}\PY{p}{)}
+        
+        \PY{c+c1}{\PYZsh{} Residual for Δ\PYZus{}h u = f}
+        \PY{n}{r} \PY{o}{=} \PY{n}{f} \PY{o}{\PYZhy{}} \PY{n}{A}\PY{p}{(}\PY{n}{u}\PY{p}{,} \PY{l+m+mi}{2}\PY{o}{*}\PY{o}{*}\PY{n}{l} \PY{o}{\PYZhy{}} \PY{l+m+mi}{1}\PY{p}{)}
+        \PY{n}{r} \PY{o}{=} \PY{n}{R}\PY{p}{(}\PY{n}{r}\PY{p}{,} \PY{l+m+mi}{2}\PY{o}{*}\PY{o}{*}\PY{n}{l} \PY{o}{\PYZhy{}} \PY{l+m+mi}{1}\PY{p}{)}
+        \PY{n}{e} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{zeros\PYZus{}like}\PY{p}{(}\PY{n}{r}\PY{p}{)}
+        \PY{n}{e} \PY{o}{=} \PY{n}{vcycle}\PY{p}{(}\PY{n}{A}\PY{p}{,} \PY{n}{R}\PY{p}{,} \PY{n}{P}\PY{p}{,} \PY{n}{e}\PY{p}{,} \PY{n}{r}\PY{p}{,} \PY{n}{l} \PY{o}{\PYZhy{}} \PY{l+m+mi}{1}\PY{p}{)}
+        \PY{n}{e} \PY{o}{=} \PY{n}{P}\PY{p}{(}\PY{n}{e}\PY{p}{,} \PY{l+m+mi}{2}\PY{o}{*}\PY{o}{*}\PY{n}{l} \PY{o}{\PYZhy{}} \PY{l+m+mi}{1}\PY{p}{)}
+        \PY{n}{u} \PY{o}{+}\PY{o}{=} \PY{n}{e}
+        
+        \PY{k}{for} \PY{n}{\PYZus{}} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{l+m+mi}{3}\PY{p}{)}\PY{p}{:}
+            \PY{n}{u} \PY{o}{=} \PY{n}{smooth}\PY{p}{(}\PY{n}{u}\PY{p}{,} \PY{l+m+mf}{0.65306}\PY{p}{,} \PY{l+m+mi}{2}\PY{o}{*}\PY{o}{*}\PY{n}{l} \PY{o}{\PYZhy{}} \PY{l+m+mi}{1}\PY{p}{,} \PY{n}{f}\PY{p}{)}
+    
+    \PY{k}{return} \PY{n}{u}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \section{Multigrid loop}\label{multigrid-loop}
+
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+\PY{c+c1}{\PYZsh{} multi grid loop}
+\PY{n}{l} \PY{o}{=} \PY{l+m+mi}{5} \PY{c+c1}{\PYZsh{} levels in V}
+\PY{n}{m} \PY{o}{=} \PY{l+m+mi}{2}\PY{o}{*}\PY{o}{*}\PY{n}{l} \PY{o}{\PYZhy{}} \PY{l+m+mi}{1} \PY{c+c1}{\PYZsh{} first number of interior points}
+\PY{n+nb}{print}\PY{p}{(}\PY{l+s+sa}{f}\PY{l+s+s2}{\PYZdq{}}\PY{l+s+s2}{m = }\PY{l+s+si}{\PYZob{}}\PY{n}{m}\PY{l+s+si}{\PYZcb{}}\PY{l+s+s2}{\PYZdq{}}\PY{p}{)}
+\PY{n}{x} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{linspace}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,} \PY{l+m+mi}{1}\PY{p}{,} \PY{n}{m}\PY{p}{)}
+\PY{n}{y} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{linspace}\PY{p}{(}\PY{l+m+mi}{0}\PY{p}{,}\PY{l+m+mi}{1}\PY{p}{,} \PY{n}{m}\PY{p}{)}
+\PY{n}{X}\PY{p}{,}\PY{n}{Y} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{meshgrid}\PY{p}{(}\PY{n}{x}\PY{p}{,} \PY{n}{y}\PY{p}{,} \PY{n}{indexing}\PY{o}{=}\PY{l+s+s1}{\PYZsq{}}\PY{l+s+s1}{ij}\PY{l+s+s1}{\PYZsq{}}\PY{p}{)}
+\PY{n}{U0} \PY{o}{=} \PY{p}{(}\PY{l+m+mi}{1} \PY{o}{+} \PY{l+m+mi}{2}\PY{o}{*}\PY{n}{X} \PY{o}{+} \PY{l+m+mi}{2}\PY{o}{*}\PY{n}{Y}\PY{p}{)}
+\PY{k}{for} \PY{n}{ic} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{m}\PY{p}{)}\PY{p}{:}
+    \PY{k}{for} \PY{n}{jc} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{m}\PY{p}{)}\PY{p}{:}
+        \PY{k}{assert} \PY{n}{U0}\PY{p}{[}\PY{n}{ic}\PY{p}{,}\PY{n}{jc}\PY{p}{]} \PY{o}{\PYZhy{}} \PY{n}{U0}\PY{o}{.}\PY{n}{flatten}\PY{p}{(}\PY{p}{)}\PY{p}{[}\PY{n}{ic} \PY{o}{+} \PY{n}{jc}\PY{o}{*}\PY{n}{m}\PY{p}{]} \PY{o}{\PYZlt{}} \PY{l+m+mf}{1e\PYZhy{}15}
+
+\PY{n}{U0} \PY{o}{=} \PY{n}{U0}\PY{o}{.}\PY{n}{flatten}\PY{p}{(}\PY{p}{)}
+\PY{n}{F} \PY{o}{=} \PY{n}{form\PYZus{}rhs}\PY{p}{(}\PY{n}{m}\PY{p}{,} \PY{n}{f\PYZus{}func}\PY{p}{,} \PY{n}{u\PYZus{}func}\PY{p}{)}
+\PY{k}{assert} \PY{n}{F}\PY{o}{.}\PY{n}{shape} \PY{o}{==} \PY{n}{U0}\PY{o}{.}\PY{n}{shape}
+
+\PY{n}{kmax} \PY{o}{=} \PY{l+m+mi}{10}
+
+\PY{n}{convergence\PYZus{}history} \PY{o}{=} \PY{p}{[}\PY{p}{]}
+
+\PY{n}{k} \PY{o}{=} \PY{l+m+mi}{0}
+\PY{n}{rk} \PY{o}{=} \PY{n}{F} \PY{o}{\PYZhy{}} \PY{n}{Amult}\PY{p}{(}\PY{n}{U0}\PY{p}{,} \PY{n}{m}\PY{p}{)}  \PY{c+c1}{\PYZsh{} residual r = f \PYZhy{} Δ\PYZus{}h u}
+\PY{n}{Uk} \PY{o}{=} \PY{n}{np}\PY{o}{.}\PY{n}{copy}\PY{p}{(}\PY{n}{U0}\PY{p}{)}
+\PY{n}{EPS} \PY{o}{=} \PY{l+m+mf}{1e\PYZhy{}4}
+\PY{k}{for} \PY{n}{k} \PY{o+ow}{in} \PY{n+nb}{range}\PY{p}{(}\PY{n}{kmax}\PY{p}{)}\PY{p}{:}
+    \PY{n}{norm} \PY{o}{=} \PY{n}{l2\PYZus{}norm\PYZus{}grid}\PY{p}{(}\PY{n}{rk}\PY{p}{,} \PY{l+m+mi}{1}\PY{o}{/}\PY{p}{(}\PY{n}{m}\PY{o}{+}\PY{l+m+mi}{1}\PY{p}{)}\PY{p}{)} \PY{c+c1}{\PYZsh{} h = 1/m+1}
+    \PY{n}{convergence\PYZus{}history}\PY{o}{.}\PY{n}{append}\PY{p}{(}\PY{n}{norm}\PY{p}{)}
+    \PY{k}{if} \PY{n}{norm} \PY{o}{\PYZlt{}} \PY{n}{EPS}\PY{p}{:} \PY{k}{break}
+
+    \PY{n}{Uk} \PY{o}{=} \PY{n}{vcycle}\PY{p}{(}\PY{n}{Amult}\PY{p}{,} \PY{n}{coarsen}\PY{p}{,} \PY{n}{scatter}\PY{p}{,} \PY{n}{Uk}\PY{p}{,} \PY{n}{F}\PY{p}{,} \PY{n}{l}\PY{p}{)}
+    \PY{n}{rk} \PY{o}{=} \PY{n}{F} \PY{o}{\PYZhy{}} \PY{n}{Amult}\PY{p}{(}\PY{n}{Uk}\PY{p}{,} \PY{n}{m}\PY{p}{)}
+
+\PY{n}{plt}\PY{o}{.}\PY{n}{semilogy}\PY{p}{(}\PY{n}{convergence\PYZus{}history}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{grid}\PY{p}{(}\PY{p}{)}
+\PY{n}{plt}\PY{o}{.}\PY{n}{show}\PY{p}{(}\PY{p}{)}
+\end{Verbatim}
+\end{tcolorbox}
+
+    \begin{Verbatim}[commandchars=\\\{\}]
+m = 31
+    \end{Verbatim}
+
+    \begin{center}
+    \adjustimage{max size={0.9\linewidth}{0.9\paperheight}}{Exercise3_KJ_files/Exercise3_KJ_16_1.png}
+    \end{center}
+    { \hspace*{\fill} \\}
+    
+    \begin{tcolorbox}[breakable, size=fbox, boxrule=1pt, pad at break*=1mm,colback=cellbackground, colframe=cellborder]
+\prompt{In}{incolor}{ }{\boxspacing}
+\begin{Verbatim}[commandchars=\\\{\}]
+
+\end{Verbatim}
+\end{tcolorbox}
+
+
+    % Add a bibliography block to the postdoc
+    
+    
+    
+\end{document}
